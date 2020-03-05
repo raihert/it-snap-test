@@ -1,17 +1,22 @@
-package com.raihert.it.services;
+package com.raihert.it.services.bpi;
 
+import com.raihert.it.ApplicationTest;
 import com.raihert.it.models.CurrentPrice;
 import com.raihert.it.models.HistoricalPrice;
+import com.raihert.it.services.http.HttpService;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class CoindeskServiceServiceTestHelper extends ApplicationServiceTestHelper {
-    private CoindeskService service = new CoindeskService();
+public class CoindeskServiceTest extends ApplicationTest {
+    private final CoindeskService service = new CoindeskService() {{
+        setCurrentPriceUrl("https://api.coindesk.com/v1/bpi/currentprice/%s.json");
+        setHistoricalPriceUrl("https://api.coindesk.com/v1/bpi/historical/close.json");
+    }};
 
     @Test
     public void successHandleCurrent() throws Exception {
-        mockService(service, 200, "/current-response.json");
+        service.setHelper(new HttpService(mockService(200, "/current-response.json")));
 
         assertEquals("https://api.coindesk.com/v1/bpi/currentprice/RUR.json", service.currentPriceUrl("RUR"));
 
@@ -29,7 +34,7 @@ public class CoindeskServiceServiceTestHelper extends ApplicationServiceTestHelp
 
     @Test
     public void successHandleHistorical() throws Exception {
-        mockService(service, 200, "/historical-response.json");
+        service.setHelper(new HttpService(mockService(200, "/historical-response.json")));
 
         HistoricalPrice prices = service.handleHistorical();
 

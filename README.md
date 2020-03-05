@@ -6,6 +6,7 @@
 
 - download docker
 - [MacOS] install docker-machine before
+- [MacOS] eval $(docker-machine env default)
 - bin/run.sh
 
 ### Requirements

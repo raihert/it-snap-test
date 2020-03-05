@@ -1,29 +1,33 @@
-package com.raihert.it;
+package com.raihert.it.services.bpi;
 
 import com.raihert.it.exceptions.JsonParsedException;
 import com.raihert.it.exceptions.ResultValidateException;
 import com.raihert.it.models.CurrentPrice;
 import com.raihert.it.models.HistoricalPrice;
 import com.raihert.it.models.Result;
-import com.raihert.it.services.CoindeskService;
-import com.raihert.it.services.ExchangeRatesService;
 import org.apache.http.util.Asserts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
-final public class ApplicationFacade {
-    private Logger logger = Logger.getGlobal();
+@Service
+public class BpiService {
+    private Logger logger = LoggerFactory.getLogger(BpiService.class);
 
-    private CoindeskService coindeskService = new CoindeskService();
-    private ExchangeRatesService exchangeRatesService = new ExchangeRatesService();
+    @Autowired
+    private CoindeskService coindeskService;
+
+    @Autowired
+    private ExchangeRatesService exchangeRatesService;
 
     private final Executor executor = Executors.newFixedThreadPool(4);
 
@@ -54,9 +58,9 @@ final public class ApplicationFacade {
                 throw new ResultValidateException(String.format("%s not valid", result));
             }
         } catch (final InterruptedException ex) {
-            logger.log(Level.SEVERE, "facade thread error", ex);
+            logger.error("facade thread error", ex);
         } catch (final ExecutionException ex) {
-            logger.log(Level.SEVERE, "facade thread error", ex);
+            logger.error("facade thread error", ex);
 
             if (ex.getCause() instanceof JsonParsedException) {
                 throw (JsonParsedException) ex.getCause();
@@ -91,7 +95,7 @@ final public class ApplicationFacade {
                     result.setMaxRate(max.getValue() / rate.getUsdRate())
             )).get();
         } catch (final InterruptedException | ExecutionException ex) {
-            logger.log(Level.SEVERE, "facade prepared thread error", ex);
+            logger.error("facade prepared thread error", ex);
         }
     }
 

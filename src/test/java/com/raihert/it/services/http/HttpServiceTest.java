@@ -1,17 +1,18 @@
-package com.raihert.it.services;
+package com.raihert.it.services.http;
 
+import com.raihert.it.ApplicationTest;
 import com.raihert.it.exceptions.JsonParsedException;
 import com.raihert.it.models.HistoricalPrice;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ApplicationServiceTest extends ApplicationServiceTestHelper {
-    private ApplicationTestService service = new ApplicationTestService();
+public class HttpServiceTest extends ApplicationTest {
+    private final HttpServiceImpl service = new HttpServiceImpl();
 
     @Test
     public void success() throws Exception {
-        mockService(service, 200, "/historical-response.json");
+        service.setHttpclient(mockService(200, "/historical-response.json"));
 
         HistoricalPrice prices = service.get("url1", HistoricalPrice.class);
 
@@ -20,7 +21,7 @@ public class ApplicationServiceTest extends ApplicationServiceTestHelper {
 
     @Test
     public void notFound() throws Exception {
-        mockService(service, 404, "some error");
+        service.setHttpclient(mockService(404, "some error"));
 
         try {
             service.get("http://url1/", HistoricalPrice.class);
@@ -30,6 +31,6 @@ public class ApplicationServiceTest extends ApplicationServiceTestHelper {
     }
 }
 
-class ApplicationTestService extends ApplicationService {
+class HttpServiceImpl extends HttpService {
     // nothing
 }

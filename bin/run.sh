@@ -1,5 +1,7 @@
 #!/bin/sh
 
-docker build -f Dockerfile -t test/maven:test-jdk-8 .
+mvn clean package
 
-docker run -it test/maven:test-jdk-8 mvn exec:java -Dexec.mainClass=com.raihert.it.Application
+docker build -f Dockerfile -t test-jdk-8 .
+
+docker run -i test-jdk-8
